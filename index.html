@@ -166,26 +166,23 @@
 
 <script>
 
-
-
-    const overlay = document.getElementById('overlay');
-    const passwordInput = document.getElementById('password');
-    const submitPasswordButton = document.getElementById('submitPassword');
-    const mainForm = document.getElementById('mainForm');
-    const canvas = document.getElementById('imageCanvas');
-    const ctx = canvas.getContext('2d');
-    const baseImage = new Image();
-    const overlayImage = new Image(); // New image for overlay Variable
-    const today = new Date();
+const overlay = document.getElementById('overlay');
+const passwordInput = document.getElementById('password');
+const submitPasswordButton = document.getElementById('submitPassword');
+const mainForm = document.getElementById('mainForm');
+const canvas = document.getElementById('imageCanvas');
+const ctx = canvas.getContext('2d');
+const baseImage = new Image();
+const overlayImage = new Image();
+const today = new Date();
 const todayString = today.toLocaleDateString();
 
-
-    // Function to handle password submission
-    submitPasswordButton.addEventListener('click', function() {
-    const password = passwordInput.value;
+// Event listener voor wachtwoord invoer
+submitPasswordButton.addEventListener('click', function () {
+    const password = passwordInput.value.trim();
 
     if (password === 'WeedW' || password === 'Chengs') {
-        baseImage.src = 'Algemene-Arbeidsovereenkomst.png'; 
+        baseImage.src = 'Algemene-Arbeidsovereenkomst.png';
         overlayImage.src = password === 'WeedW' ? 'weedworld.png' : 'cheng_wokroll.png';
 
         let baseLoaded = false;
@@ -193,150 +190,108 @@ const todayString = today.toLocaleDateString();
 
         baseImage.onload = () => {
             baseLoaded = true;
-            if (overlayLoaded) drawContent();
+            if (overlayLoaded) drawContent(password);
         };
 
         overlayImage.onload = () => {
             overlayLoaded = true;
-            if (baseLoaded) drawContent();
+            if (baseLoaded) drawContent(password);
         };
+
+        // Verberg de overlay en toon het formulier + canvas pas na het invullen van het wachtwoord
+        overlay.style.display = 'none';
+        mainForm.style.display = 'block';
+        canvas.style.display = 'block';
     } else {
+        // Stuur de gebruiker naar een andere pagina bij fout wachtwoord
         window.location.href = "invoer.html";
     }
+});
 
-    function drawContent() {
-        console.log('Afbeeldingen geladen, nu tekenen.');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
-        ctx.drawImage(overlayImage, 1200, 100, 300, password === 'WeedW' ? 250 : 300);
+function drawContent(password) {
+    console.log('Afbeeldingen geladen, nu tekenen.');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(overlayImage, 1200, 100, 300, password === 'WeedW' ? 250 : 300);
 
-        ctx.fillStyle = 'Black';
-        ctx.font = '30px Arial';
+    ctx.fillStyle = 'Black';
+    ctx.font = '30px Arial';
 
-        if (password === 'WeedW') {
-            ctx.fillText(`Weed World`, 195, 242);
-            ctx.fillText(`Hawick Avenue 312, Los Santos`, 195, 278);
-            ctx.fillText(`C. de Witte`, 195, 418);
-            ctx.fillText(`Hawick Avenue 312, Los Santos`, 205, 1929);
-            ctx.fillText(`${todayString}`, 205, 1965);
-            ctx.fillText(`${todayString}`, 434, 876);
-            ctx.font = 'italic 50px "Brush Script MT", cursive';
-            ctx.fillText('C. de Witte', 129, 2076);
-        } else if (password === 'Chengs') {
-            ctx.fillText(`Cheng's Wok & Roll`, 195, 242);
-            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 195, 278);
-            ctx.fillText(`W. Cheng`, 195, 418);
-            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 205, 1929);
-            ctx.fillText(`${todayString}`, 205, 1965);
-            ctx.fillText(`${todayString}`, 434, 876);
-            ctx.font = 'italic 50px "Brush Script MT", cursive';
-            ctx.fillText('W. Cheng', 129, 2076);
-        }
-
-        overlay.style.display = 'none'; 
-        mainForm.style.display = 'block'; 
-        canvas.style.display = 'block';
+    if (password === 'WeedW') {
+        ctx.fillText(`Weed World`, 195, 242);
+        ctx.fillText(`Hawick Avenue 312, Los Santos`, 195, 278);
+        ctx.fillText(`C. de Witte`, 195, 418);
+        ctx.fillText(`Hawick Avenue 312, Los Santos`, 205, 1929);
+        ctx.fillText(`${todayString}`, 205, 1965);
+        ctx.fillText(`${todayString}`, 434, 876);
+        ctx.font = 'italic 50px "Brush Script MT", cursive';
+        ctx.fillText('C. de Witte', 129, 2076);
+    } else if (password === 'Chengs') {
+        ctx.fillText(`Cheng's Wok & Roll`, 195, 242);
+        ctx.fillText(`Palomino Avenue 1221, Los Santos`, 195, 278);
+        ctx.fillText(`W. Cheng`, 195, 418);
+        ctx.fillText(`Palomino Avenue 1221, Los Santos`, 205, 1929);
+        ctx.fillText(`${todayString}`, 205, 1965);
+        ctx.fillText(`${todayString}`, 434, 876);
+        ctx.font = 'italic 50px "Brush Script MT", cursive';
+        ctx.fillText('W. Cheng', 129, 2076);
     }
-});
-
-        overlay.style.display = 'none'; // Hide the overlay
-        mainForm.style.display = 'block'; // Show the main form
-        canvas.style.display = 'block'; // Show the canvas
-
-        // Load the image and draw it on the canvas
-        image.src = imageSrc;
-        image.onload = () => {
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        };
-    });
-
-    // Main form submission logic (same as your original code)
-    mainForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log('Form submitted');
-
-const applicantName = document.getElementById('applicantName').value;
-
-const bsn = document.getElementById('bsn').value;
-const judgeName = document.getElementById('judgeName').value 
-
-
-
-// Set text properties
-ctx.fillStyle = 'Black';
-ctx.font = '30px Arial';
-
-
-const applicantText = ` ${applicantName}`;
-
-
-ctx.fillText(applicantText, 185 , 560 );
-ctx.fillText("-", 190 , 596 );
-ctx.fillText(bsn, 323 , 630 );
-
-// KLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-// Add lawyer signature 
-ctx.fillStyle = 'Black';
-ctx.font = 'bold 30px Arial';
-
-const judgeText = ` ${judgeName}`;
-ctx.fillText(judgeText, 509, 911);
-
-
-
-
-
-
-
-
-
-// Convert canvas content to a PNG data URL
-const imageDataUrl = canvas.toDataURL('image/png');
-console.log('Canvas to image data URL created:', imageDataUrl);
-
-// Create a new FormData object to send the image via POST request
-const formData = new FormData();
-
-// Convert the data URL to a Blob (binary data) for file upload
-const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
-const uintArray = new Uint8Array(byteArray.length);
-for (let i = 0; i < byteArray.length; i++) {
-    uintArray[i] = byteArray.charCodeAt(i);
 }
-const blob = new Blob([uintArray], { type: 'image/png' });
-console.log('Blob created:', blob);
 
-// Append the image file to FormData
-formData.append('file', blob, password +applicantName+'_'+ todayString + '.png');
-console.log('Form data prepared for upload');
+// **Formulier Submit Event**
+mainForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    console.log('Formulier verzonden');
 
-// Send the POST request with the image
-const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-const url = 'https://api.fivemanage.com/api/image';
+    const applicantName = document.getElementById('applicantName').value;
+    const bsn = document.getElementById('bsn').value;
+    const judgeName = document.getElementById('judgeName').value;
 
-fetch(url, {
-    method: 'POST',
-    headers: {
-        'Authorization': apiKey,
-    },
-    body: formData
-})
-.then(response => {
-    console.log('Response received:', response);
-    return response.json();
-})
-.then(data => {
-    console.log('Image uploaded successfully:', data);
-    const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
-    
-    alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
-})
-.catch(error => {
-    console.error('Error uploading image:', error);
-    alert('Failed to upload image');
+    // Tekst plaatsen op canvas
+    ctx.fillStyle = 'Black';
+    ctx.font = '30px Arial';
+    ctx.fillText(applicantName, 185, 560);
+    ctx.fillText("-", 190, 596);
+    ctx.fillText(bsn, 323, 630);
+
+    ctx.fillStyle = 'Black';
+    ctx.font = 'bold 30px Arial';
+    ctx.fillText(judgeName, 509, 911);
+
+    // Canvas omzetten naar afbeelding
+    const imageDataUrl = canvas.toDataURL('image/png');
+
+    // Afbeelding uploaden naar API
+    const formData = new FormData();
+    const byteArray = atob(imageDataUrl.split(',')[1]);
+    const uintArray = new Uint8Array(byteArray.length);
+    for (let i = 0; i < byteArray.length; i++) {
+        uintArray[i] = byteArray.charCodeAt(i);
+    }
+    const blob = new Blob([uintArray], { type: 'image/png' });
+
+    formData.append('file', blob, applicantName + '_' + todayString + '.png');
+
+    const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+    const url = 'https://api.fivemanage.com/api/image';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': apiKey,
+        },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Afbeelding geüpload:', data);
+            alert('Afbeelding geüpload: ' + data.url);
+        })
+        .catch(error => {
+            console.error('Fout bij uploaden:', error);
+            alert('Upload mislukt');
+        });
 });
-});
-
 </script>
 </body>
 </html>
