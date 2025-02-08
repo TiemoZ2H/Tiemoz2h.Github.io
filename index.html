@@ -182,60 +182,66 @@ const todayString = today.toLocaleDateString();
 
     // Function to handle password submission
     submitPasswordButton.addEventListener('click', function() {
-        const password = passwordInput.value;
+    const password = passwordInput.value;
+
+    if (password === 'WeedW' || password === 'Chengs') {
+        baseImage.src = 'Algemene-Arbeidsovereenkomst.png'; 
+        overlayImage.src = password === 'WeedW' ? 'weedworld.png' : 'cheng_wokroll.png';
+
+        let baseLoaded = false;
+        let overlayLoaded = false;
+
+        baseImage.onload = () => {
+            baseLoaded = true;
+            if (overlayLoaded) drawContent();
+        };
+
+        overlayImage.onload = () => {
+            overlayLoaded = true;
+            if (baseLoaded) drawContent();
+        };
+    } else {
+        window.location.href = "invoer.html";
+    }
+
+    function drawContent() {
+        console.log('Afbeeldingen geladen, nu tekenen.');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(overlayImage, 1200, 100, 300, password === 'WeedW' ? 250 : 300);
+
+        ctx.fillStyle = 'Black';
+        ctx.font = '30px Arial';
 
         if (password === 'WeedW') {
-            baseImage.src = 'Algemene-Arbeidsovereenkomst.png'; // Replace with the path to your base image
-            overlayImage.src = 'weedworld.png'; // Replace with the path to your overlay image
-            baseImage.onload = () => {
-        console.log('Base image loaded successfully');
-        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
-        overlayImage.onload = () => {
-            console.log('Overlay image loaded successfully');
-            // Draw the overlay image at desired position
-            ctx.drawImage(overlayImage, 1200, 100, 300, 250); // Adjust position and size as needed
-            ctx.fillStyle = 'Black';
-            ctx.font = '30px Arial';
-            ctx.fillText(`Weed World`, 195,242); // Adjust coordinates as needed
-            ctx.fillText(`Hawick Avenue 312, Los Santos`, 195,  278);
-            ctx.fillText(`C. de Witte`, 195,  418);
-            ctx.fillText(`Hawick Avenue 312, Los Santos`, 205,  1929);
+            ctx.fillText(`Weed World`, 195, 242);
+            ctx.fillText(`Hawick Avenue 312, Los Santos`, 195, 278);
+            ctx.fillText(`C. de Witte`, 195, 418);
+            ctx.fillText(`Hawick Avenue 312, Los Santos`, 205, 1929);
             ctx.fillText(`${todayString}`, 205, 1965);
             ctx.fillText(`${todayString}`, 434, 876);
-            ctx.fillStyle = 'Black';
-ctx.font = 'italic 50px "Brush Script MT", cursive';
-ctx.fillText( 'C. de Witte', 129,  2076);
-        };
-    };
+            ctx.font = 'italic 50px "Brush Script MT", cursive';
+            ctx.fillText('C. de Witte', 129, 2076);
         } else if (password === 'Chengs') {
-            baseImage.src = 'Algemene-Arbeidsovereenkomst.png'; // Replace with the path to your base image
-            overlayImage.src = 'cheng_wokroll.png'; // Replace with the path to your overlay image
-            baseImage.onload = () => {
-        console.log('Base image loaded successfully');
-        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
-        overlayImage.onload = () => {
-            console.log('Overlay image loaded successfully');
-            // Draw the overlay image at desired position
-            ctx.drawImage(overlayImage, 1200, 100, 300, 300); // Adjust position and size as needed
-            ctx.fillStyle = 'Black';
-            ctx.font = '30px Arial';
-            ctx.fillText(`Cheng's Wok & Roll`, 195,242); // Adjust coordinates as needed
-            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 195,  278);
-            ctx.fillText(`W. Cheng`, 195,  418);
-            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 205,  1929);
+            ctx.fillText(`Cheng's Wok & Roll`, 195, 242);
+            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 195, 278);
+            ctx.fillText(`W. Cheng`, 195, 418);
+            ctx.fillText(`Palomino Avenue 1221, Los Santos`, 205, 1929);
             ctx.fillText(`${todayString}`, 205, 1965);
             ctx.fillText(`${todayString}`, 434, 876);
-            ctx.fillStyle = 'Black';
-ctx.font = 'italic 50px "Brush Script MT", cursive';
-ctx.fillText( 'W. Cheng', 129,  2076);
-
-        };
-    };
-        } else {
+            ctx.font = 'italic 50px "Brush Script MT", cursive';
+            ctx.fillText('W. Cheng', 129, 2076);
+        }
+    else {
             window.location.href = "invoer.html";
             
             return;
         }
+        overlay.style.display = 'none'; 
+        mainForm.style.display = 'block'; 
+        canvas.style.display = 'block';
+    }
+});
 
         overlay.style.display = 'none'; // Hide the overlay
         mainForm.style.display = 'block'; // Show the main form
