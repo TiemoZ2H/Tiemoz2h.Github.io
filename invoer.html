@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Overlay Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #overlayForm {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #overlayForm label {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+        }
+
+        #overlayForm input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        #overlayForm button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 1.2em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+ 
+        #overlayForm button:hover {
+            background-color: #45a049;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #overlayForm {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+      
+    </style>
+</head>
+<body>
+
+<h1> Arbeidsovereenkomst </h1>
+<form id="overlayForm">
+    <label for="applicantName">Naam:</label>
+    <input type="text" id="applicantName" >
+
+    <label for="lawyerName">Teken Adres:</label>
+    <input type="text" id="lawyerName" >
+    <button type="submit">Maak Nieuwe Akte</button>
+</form>
+<canvas id="imageCanvas" width="1654" height="2339"></canvas>
+
+
+<script>
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const baseImage = new Image();
+    
+    // Prompt the user for the image URLs
+    const baseImageUrl = prompt("Please enter the URL for the base image (PNG format):");
+    
+    // Set the image sources to the user-provided URLs
+    baseImage.src = baseImageUrl;
+   
+
+    baseImage.onload = () => {
+        console.log('Base image loaded successfully');
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+        overlayImage.onload = () => {
+            console.log('Overlay image loaded successfully');
+            // Draw the overlay image at desired position
+            ctx.drawImage(overlayImage, 1200, 100, 300, 300); // Adjust position and size as needed
+        };
+    };
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log('Form submitted');
+
+        const applicantName = document.getElementById('applicantName').value;
+        const lawyerName = document.getElementById('lawyerName').value;
+// Convert canvas content to a PNG data URL
+const imageDataUrl = canvas.toDataURL('image/png');
+        console.log('Canvas to image data URL created:', imageDataUrl);
+
+        // Create a new FormData object to send the image via POST request
+        const formData = new FormData();
+        
+        // Convert the data URL to a Blob (binary data) for file upload
+        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
+        const uintArray = new Uint8Array(byteArray.length);
+        for (let i = 0; i < byteArray.length; i++) {
+            uintArray[i] = byteArray.charCodeAt(i);
+        }
+        const blob = new Blob([uintArray], { type: 'image/png' });
+        console.log('Blob created:', blob);
+
+        // Append the image file to FormData
+        formData.append('file', blob, applicantName+'_'+ todayString + '.png');
+        console.log('Form data prepared for upload');
+
+        // Send the POST request with the image
+        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+        const url = 'https://api.fivemanage.com/api/image';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Image uploaded successfully:', data);
+            const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
+            
+            alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
+        })
+        .catch(error => {
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
+        });
+    });
+    
+</script>
+
+</body>
+</html>
