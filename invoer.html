@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Overlay Form</title>
@@ -15,42 +14,48 @@
             padding: 0;
         }
 
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-top: 20px;
-            font-weight: bold;
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #overlayForm {
             background-color: #fff;
             padding: 20px;
-            margin: 20px auto;
-            width: 60%;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        #overlayForm label {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
             text-align: left;
+            width: 300px;
         }
 
-        #overlayForm input {
+        label {
+            font-size: 1em;
+            color: #555;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 10px;
+            margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1em;
             box-sizing: border-box;
         }
 
-        #overlayForm button {
-            padding: 12px 25px;
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
             background-color: #4CAF50;
             color: #fff;
             border: none;
@@ -59,8 +64,8 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
- 
-        #overlayForm button:hover {
+
+        button:hover {
             background-color: #45a049;
         }
 
@@ -70,178 +75,108 @@
             background-color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            #overlayForm {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-        }
-      
     </style>
 </head>
 <body>
-
-<h1>Jachtakte uitgaven form</h1>
-<form id="overlayForm">
-    <label for="applicantName">Uitgegeven aan:</label>
-    <input type="text" id="applicantName" required>
-
-    <label for="lawyerName">Advocaat:</label>
-    <input type="text" id="lawyerName" required>
-
-    <label for="bsn">Burger service nummer:</label>
-    <input type="text" id="bsn" required>
-
-    <label for="judgeName">Rechter:</label>
-    <input type="text" id="judgeName" value="Felix Keizer" required>
-
-    <button type="submit">Maak Nieuwe Akte</button>
-</form>
-
-<canvas id="imageCanvas" width="1200" height="1000"></canvas>
-
-<script>
-    const form = document.getElementById('overlayForm');
-    const canvas = document.getElementById('imageCanvas');
-    const ctx = canvas.getContext('2d');
-    const image = new Image();
-    image.src = 'achtergrond.jpg'; // Replace with the path to your image
-
-    image.onload = () => {
-        console.log('Image loaded successfully');
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
-
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log('Form submitted');
-
-        const applicantName = document.getElementById('applicantName').value;
-        const lawyerName = document.getElementById('lawyerName').value.toUpperCase();
-        const bsn = document.getElementById('bsn').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
+    <div id="overlay">
+        <form id="overlayForm">
+            <label for="imageUrl">Afbeelding URL:</label>
+            <input type="url" id="imageUrl" required>
+            
+            <label for="name">Naam:</label>
+            <input type="text" id="name" required>
+            
+            <label for="location">Locatie van ondertekening:</label>
+            <input type="text" id="location" required>
+            
+            <button type="submit">Verwerken</button>
+        </form>
+    </div>
+    
+    <canvas id="imageCanvas" width="1654" height="2339"></canvas>
+    
+    <script>
+        const overlay = document.getElementById('overlay');
+        const form = document.getElementById('overlayForm');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
         const today = new Date();
         const todayString = today.toLocaleDateString();
 
-        // Calculate end date (2 weeks from today)
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 14);
-        const endDateString = endDate.toLocaleDateString();
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            overlay.style.display = 'none';
+            
+            const imageUrl = document.getElementById('imageUrl').value;
+            const name = document.getElementById('name').value;
+            const location = document.getElementById('location').value;
 
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
+            // Fetch the image from the URL
+            fetch(imageUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const image = new Image();
+                    const url = URL.createObjectURL(blob);
+                    image.src = url;
 
-        // Set text properties
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '50px PT Serif';
-        // Center text for applicant name
-        const applicantText = ` ${applicantName}`;
-        const applicantTextWidth = ctx.measureText(applicantText).width;
-        const applicantX = (canvas.width - applicantTextWidth) / 2;
-        const applicantY = canvas.height / 2 - 140; // Adjust Y position slightly upward
-        ctx.fillText(applicantText, applicantX, applicantY);
+                    image.onload = () => {
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                        
+                        ctx.fillStyle = 'Black';
+                        ctx.font = '50px Lucida Handwriting';
+                        ctx.fillText(name, 930, 2076);
+                        
+                        ctx.font = '30px Arial';
+                        ctx.fillText(location, 985, 1929);
+                        ctx.fillText(`${todayString}`, 985, 1965);
 
-        // Add lawyer signature 
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'bold 23px PT Serif';
+                        // Convert canvas to image
+                        const imageDataUrl = canvas.toDataURL('image/png');
 
-        // Adjust lawyer's name position
-        const lawyerText = ` ${lawyerName}`;
-        const lawyerTextWidth = ctx.measureText(lawyerText).width;
-        const lawyerX = (canvas.width - lawyerTextWidth) / 2 + 180; // Adjust X position slightly to the right
-        const lawyerY = canvas.height / 2 + 96; // Adjust Y position slightly below center
-        ctx.fillText(lawyerText, lawyerX, lawyerY);
+                        // Upload image to API
+                        const formData = new FormData();
+                        const byteArray = atob(imageDataUrl.split(',')[1]);
+                        const uintArray = new Uint8Array(byteArray.length);
+                        
+                        for (let i = 0; i < byteArray.length; i++) {
+                            uintArray[i] = byteArray.charCodeAt(i);
+                        }
 
-        // Add the lawyer's name again with a different font
-        const secondLawyerY = lawyerY - 50; // Adjust Y position for the second instance
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'italic 23px "Brush Script MT", cursive'; // Set the font for the second instance
-        ctx.fillText(lawyerText, lawyerX, secondLawyerY);
+                        const blob = new Blob([uintArray], { type: 'image/png' });
 
-        // Add judge's name
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'bold 33px PT Serif'; // Set font for judge's name
-        const judgeText = ` ${judgeName}`;
-        const judgeTextWidth = ctx.measureText(judgeText).width;
-        const judgeX = (canvas.width - judgeTextWidth) / 2 - 190; // Center judge's name
+                        formData.append('file', blob, name + '_' + todayString + '.png');
 
+                        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+                        const url = 'https://api.fivemanage.com/api/image';
 
-        const judgeY = secondLawyerY + 50; // Position below the second lawyer's name
-        ctx.fillText(judgeText, judgeX, judgeY);
-
-        const secondJudgeY = judgeY - 50; // Adjust Y position for the second instance
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'italic 33px "Brush Script MT", cursive'; // Set the font for the second instance
-        ctx.fillText(judgeText, judgeX, secondJudgeY);
-
-        ctx.fillText(` ${bsn}`, 10, 990); // Adjust coordinates as needed
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '25px PT Serif';
-        ctx.fillText(` ${todayString}`, 418, 740); // Adjust coordinates as needed
-        ctx.fillText(` ${endDateString}`, 788, 740); // Adjust coordinates as needed
-
-        // Convert canvas content to a PNG data URL
-        const imageDataUrl = canvas.toDataURL('image/png');
-        console.log('Canvas to image data URL created:', imageDataUrl);
-
-        // Create a new FormData object to send the image via POST request
-        const formData = new FormData();
-        
-        // Convert the data URL to a Blob (binary data) for file upload
-        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
-        const uintArray = new Uint8Array(byteArray.length);
-        for (let i = 0; i < byteArray.length; i++) {
-            uintArray[i] = byteArray.charCodeAt(i);
-        }
-        const blob = new Blob([uintArray], { type: 'image/png' });
-        console.log('Blob created:', blob);
-
-        // Append the image file to FormData
-        formData.append('file', blob, applicantName+'_'+ todayString + '.png');
-        console.log('Form data prepared for upload');
-
-        // Send the POST request with the image
-        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-        const url = 'https://api.fivemanage.com/api/image';
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': apiKey,
-            },
-            body: formData
-        })
-        .then(response => {
-            console.log('Response received:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Image uploaded successfully:', data);
-        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
-        
-        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-            alert('Failed to upload image');
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': apiKey,
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Afbeelding geüpload:', data);
+                            alert('Afbeelding geüpload: ' + data.url);
+                        })
+                        .catch(error => {
+                            console.error('Fout bij uploaden:', error);
+                            alert('Upload mislukt');
+                        });
+                    };
+                })
+                .catch(error => {
+                    console.error('Fout bij het ophalen van de afbeelding:', error);
+                    alert('Fout bij het ophalen van de afbeelding');
+                });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
