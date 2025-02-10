@@ -181,6 +181,12 @@ const todayString = today.toLocaleDateString();
 submitPasswordButton.addEventListener('click', function () {
     const password = passwordInput.value.trim();
 
+    if (password === '') {
+        // Als het wachtwoord leeg is, stuur de gebruiker door
+        window.location.href = "invoer.html";
+        return;
+    }
+
     if (password === 'WeedW' || password === 'Chengs') {
         baseImage.src = 'Algemene-Arbeidsovereenkomst.png';
         overlayImage.src = password === 'WeedW' ? 'weedworld.png' : 'cheng_wokroll.png';
@@ -251,7 +257,7 @@ mainForm.addEventListener('submit', function (event) {
     ctx.fillStyle = 'Black';
     ctx.font = '30px Arial';
     ctx.fillText(applicantName, 250, 560);
-    ctx.fillText("-", 190, 596);
+    ctx.fillText("-", 220, 596);
     ctx.fillText(bsn, 323, 630);
 
     ctx.fillStyle = 'Black';
