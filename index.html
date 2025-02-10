@@ -276,7 +276,10 @@ mainForm.addEventListener('submit', function (event) {
     }
     const blob = new Blob([uintArray], { type: 'image/png' });
 
-    formData.append('file', blob, applicantName + '_' + todayString + '.png');
+    const Newname= applicantName;
+    const nospacename= Newname.split(' ').join('');
+
+    formData.append('file', blob, nospacename + '_' + todayString + '.png');
 
     const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
     const url = 'https://api.fivemanage.com/api/image';
