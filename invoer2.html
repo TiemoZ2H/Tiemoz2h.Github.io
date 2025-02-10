@@ -54,12 +54,12 @@
     </div>
     
     <script>
-        function loadImage() {
+            function loadImage() {
     const imageUrl = document.getElementById('imageUrl').value;
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    fetch(imageUrl, { mode: 'cors' })
+    fetch("https://cors-anywhere.herokuapp.com/" + imageUrl, { mode: 'cors' }) // Add proxy
         .then(response => response.blob())
         .then(blob => {
             const reader = new FileReader();
@@ -75,7 +75,7 @@
             reader.readAsDataURL(blob);
         })
         .catch(error => {
-            alert("Failed to load image. Ensure the URL is accessible.");
+            alert("Failed to load image. Ensure the URL allows CORS.");
             console.error("Image Load Error:", error);
         });
 }
