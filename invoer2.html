@@ -55,24 +55,31 @@
     
     <script>
         function loadImage() {
-            const imageUrl = document.getElementById('imageUrl').value;
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            img.crossOrigin = "anonymous"; // Allow cross-origin images
-            
-            img.onload = function() {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+    const imageUrl = document.getElementById('imageUrl').value;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    fetch(imageUrl, { mode: 'cors' })
+        .then(response => response.blob())
+        .then(blob => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = event.target.result;
             };
-            
-            img.onerror = function() {
-                alert("Failed to load image. Make sure the URL is valid and supports CORS.");
-            };
-            
-            img.src = imageUrl;
-        }
+            reader.readAsDataURL(blob);
+        })
+        .catch(error => {
+            alert("Failed to load image. Ensure the URL is accessible.");
+            console.error("Image Load Error:", error);
+        });
+}
+
 
         function uploadImage() {
             const canvas = document.getElementById('canvas');
