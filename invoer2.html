@@ -1,100 +1,113 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Upload</title>
+    <title>Canvas Image Uploader</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 90%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        canvas {
+            border: 1px solid black; 
+            margin-top: 10px;
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <form id="uploadForm">
-        <label for="background">Achtergrond foto:</label>
-        <input type="file" id="background" accept="image/*" required><br>
-        
-        <label for="name">Naam:</label>
-        <input type="text" id="name" required><br>
-        
-        <label for="place">Plaats:</label>
-        <input type="text" id="place" required><br>
-        
-        <button type="submit">Upload</button>
-    </form>
-    
-    <canvas id="canvas" width="800" height="600" style="display:none;"></canvas>
-    <div id="linkContainer" style="display:none;">
-        <a id="uploadedImageLink" target="_blank">Klik hier om de geüploade afbeelding te bekijken</a>
+    <div class="container">
+        <h1>Upload an Image from URL</h1>
+        <input type="text" id="imageUrl" placeholder="Enter image URL">
+        <button onclick="loadImage()">Load Image</button>
+        <canvas id="canvas"></canvas>
+        <button onclick="uploadImage()">Upload Image</button>
     </div>
-
+    
     <script>
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const backgroundInput = document.getElementById('background');
-    const name = document.getElementById('name').value;
-    const place = document.getElementById('place').value;
-
-    if (backgroundInput.files.length === 0) {
-        alert('Selecteer een achtergrondfoto.');
-        return;
-    }
-
-    const backgroundFile = backgroundInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
+        function loadImage() {
+            const imageUrl = document.getElementById('imageUrl').value;
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = "anonymous"; // Allow cross-origin images
             
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            ctx.font = '30px Arial';
-            ctx.fillText(name, 50, 50);
-            ctx.fillText(place, 50, 100);
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+            };
+            
+            img.onerror = function() {
+                alert("Failed to load image. Make sure the URL is valid and supports CORS.");
+            };
+            
+            img.src = imageUrl;
+        }
 
+        function uploadImage() {
+            const canvas = document.getElementById('canvas');
             const imageDataUrl = canvas.toDataURL('image/png');
-
-            // Afbeelding uploaden naar API
             const formData = new FormData();
             const byteArray = atob(imageDataUrl.split(',')[1]);
             const uintArray = new Uint8Array(byteArray.length);
-
+            
             for (let i = 0; i < byteArray.length; i++) {
                 uintArray[i] = byteArray.charCodeAt(i);
             }
-
+            
             const blob = new Blob([uintArray], { type: 'image/png' });
-            const todayString = new Date().toISOString().split('T')[0];
-
-            formData.append('file', blob, name + '_' + todayString + '.png');
-
+            const fileName = 'uploaded_image_' + new Date().toISOString().split('T')[0] + '.png';
+            
+            formData.append('file', blob, fileName);
+            
             const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
             const url = 'https://api.fivemanage.com/api/image';
-
+            
             fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Authorization': apiKey,
-                },
+                headers: { 'Authorization': apiKey },
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Afbeelding geüpload:', data);
-                alert('Afbeelding geüpload: ' + data.url);
-                // Toon de link naar de afbeelding
-                const linkContainer = document.getElementById('linkContainer');
-                const uploadedImageLink = document.getElementById('uploadedImageLink');
-                uploadedImageLink.href = data.url;
-                linkContainer.style.display = 'block';
+                console.log('Image uploaded:', data);
+                alert('Image uploaded: ' + data.url);
             })
             .catch(error => {
-                console.error('Fout bij uploaden:', error);
-                alert('Upload mislukt');
+                console.error('Upload failed:', error);
+                alert('Upload failed');
             });
-        };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(backgroundFile);
-});
+        }
     </script>
 </body>
+</html>
