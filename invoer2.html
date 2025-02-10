@@ -1,130 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        canvas {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loadImage').addEventListener('click', function() {
-                const imageUrl = document.getElementById('imageUrl').value;
-                const canvas = document.getElementById('imageCanvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    document.getElementById('uploadImage').style.display = 'block';
-                };
-
-                img.src = imageUrl;
-            });
-
-            document.getElementById('uploadImage').addEventListener('click', function() {
-                const canvas = document.getElementById('imageCanvas');
-                const imageDataUrl = canvas.toDataURL('image/png');
-
-                // Afbeelding uploaden naar API
-                const formData = new FormData();
-                const byteArray = atob(imageDataUrl.split(',')[1]);
-                const uintArray = new Uint8Array(byteArray.length);
-
-                for (let i = 0; i < byteArray.length; i++) {
-                    uintArray[i] = byteArray.charCodeAt(i);
-                }
-
-                const blob = new Blob([uintArray], { type: 'image/png' });
-                const today = new Date();
-                const todayString = today.toISOString().slice(0, 10);
-                const name = 'exampleName'; // replace with the actual name
-                formData.append('file', blob, name + '_' + todayString + '.png');
-
-                const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-                const url = 'https://api.fivemanage.com/api/image';
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': apiKey,
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Afbeelding geüpload:', data);
-                    alert('Afbeelding geüpload: ' + data.url);
-                })
-                .catch(error => {
-                    console.error('Fout bij uploaden:', error);
-                    alert('Upload mislukt');
-                });
-            });
-        });
-    </script>
+    <title>Canvas Upload</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Upload Image</h1>
-        <input type="text" id="imageUrl" placeholder="Enter image URL (PNG)">
-        <button id="loadImage">Load Image</button>
-        <canvas id="imageCanvas" width="1654" height="2339" style="display:none;"></canvas>
-        <button id="uploadImage" style="display:none;">Upload Image</button>
-    </div>
+    <form id="uploadForm">
+        <label for="background">Achtergrond foto:</label>
+        <input type="file" id="background" accept="image/*" required><br>
+        
+        <label for="name">Naam:</label>
+        <input type="text" id="name" required><br>
+        
+        <label for="place">Plaats:</label>
+        <input type="text" id="place" required><br>
+        
+        <button type="submit">Upload</button>
+    </form>
+    
+    <canvas id="canvas" width="800" height="600" style="display:none;"></canvas>
+
+    <script>
+
+document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const backgroundInput = document.getElementById('background');
+    const name = document.getElementById('name').value;
+    const place = document.getElementById('place').value;
+
+    if (backgroundInput.files.length === 0) {
+        alert('Selecteer een achtergrondfoto.');
+        return;
+    }
+
+    const backgroundFile = backgroundInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.font = '30px Arial';
+            ctx.fillText(name, 50, 50);
+            ctx.fillText(place, 50, 100);
+
+            const imageDataUrl = canvas.toDataURL('image/png');
+
+            // Afbeelding uploaden naar API
+            const formData = new FormData();
+            const byteArray = atob(imageDataUrl.split(',')[1]);
+            const uintArray = new Uint8Array(byteArray.length);
+
+            for (let i = 0; i < byteArray.length; i++) {
+                uintArray[i] = byteArray.charCodeAt(i);
+            }
+
+            const blob = new Blob([uintArray], { type: 'image/png' });
+            const todayString = new Date().toISOString().split('T')[0];
+
+            formData.append('file', blob, name + '_' + todayString + '.png');
+
+            const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+            const url = 'https://api.fivemanage.com/api/image';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': apiKey,
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Afbeelding geüpload:', data);
+                alert('Afbeelding geüpload: ' + data.url);
+            })
+            .catch(error => {
+                console.error('Fout bij uploaden:', error);
+                alert('Upload mislukt')
+            });
+        };
+    };
+});
+    </script>
 </body>
 </html>
