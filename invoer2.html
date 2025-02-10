@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Overlay Form</title>
@@ -71,7 +70,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             #overlayForm {
                 width: 90%;
@@ -81,13 +79,15 @@
                 font-size: 2em;
             }
         }
-      
     </style>
 </head>
 <body>
 
 <h1>Jachtakte uitgaven form</h1>
 <form id="overlayForm">
+    <label for="backgroundUrl">Achtergrondafbeelding URL:</label>
+    <input type="text" id="backgroundUrl" required>
+
     <label for="applicantName">Uitgegeven aan:</label>
     <input type="text" id="applicantName" required>
 
@@ -109,80 +109,34 @@
     const form = document.getElementById('overlayForm');
     const canvas = document.getElementById('imageCanvas');
     const ctx = canvas.getContext('2d');
-    const image = new Image();
-    image.src = 'achtergrond.jpg'; // Replace with the path to your image
-
-    image.onload = () => {
-        console.log('Image loaded successfully');
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
-
+    
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-        console.log('Form submitted');
 
+        const backgroundUrl = document.getElementById('backgroundUrl').value;
         const applicantName = document.getElementById('applicantName').value;
         const lawyerName = document.getElementById('lawyerName').value.toUpperCase();
         const bsn = document.getElementById('bsn').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
-        const today = new Date();
-        const todayString = today.toLocaleDateString();
+        const judgeName = document.getElementById('judgeName').value || "Felix Keizer";
+        const today = new Date().toLocaleDateString();
+        
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        image.src = backgroundUrl;
 
-        // Calculate end date (2 weeks from today)
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 14);
-        const endDateString = endDate.toLocaleDateString();
-
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
-
-        // Set text properties
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '50px PT Serif';
-        // Center text for applicant name
-        const applicantText = ` ${applicantName}`;
-        const applicantTextWidth = ctx.measureText(applicantText).width;
-        const applicantX = (canvas.width - applicantTextWidth) / 2;
-        const applicantY = canvas.height / 2 - 140; // Adjust Y position slightly upward
-        ctx.fillText(applicantText, applicantX, applicantY);
-
-        // Add lawyer signature 
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'bold 23px PT Serif';
-
-        // Adjust lawyer's name position
-        const lawyerText = ` ${lawyerName}`;
-        const lawyerTextWidth = ctx.measureText(lawyerText).width;
-        const lawyerX = (canvas.width - lawyerTextWidth) / 2 + 180; // Adjust X position slightly to the right
-        const lawyerY = canvas.height / 2 + 96; // Adjust Y position slightly below center
-        ctx.fillText(lawyerText, lawyerX, lawyerY);
-
-        // Add the lawyer's name again with a different font
-        const secondLawyerY = lawyerY - 50; // Adjust Y position for the second instance
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'italic 23px "Brush Script MT", cursive'; // Set the font for the second instance
-        ctx.fillText(lawyerText, lawyerX, secondLawyerY);
-
-        // Add judge's name
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'bold 33px PT Serif'; // Set font for judge's name
-        const judgeText = ` ${judgeName}`;
-        const judgeTextWidth = ctx.measureText(judgeText).width;
-        const judgeX = (canvas.width - judgeTextWidth) / 2 - 190; // Center judge's name
-
-
-        const judgeY = secondLawyerY + 50; // Position below the second lawyer's name
-        ctx.fillText(judgeText, judgeX, judgeY);
-
-        const secondJudgeY = judgeY - 50; // Adjust Y position for the second instance
-        ctx.fillStyle = '#3d464f';
-        ctx.font = 'italic 33px "Brush Script MT", cursive'; // Set the font for the second instance
-        ctx.fillText(judgeText, judgeX, secondJudgeY);
-
-        ctx.fillText(` ${bsn}`, 10, 990); // Adjust coordinates as needed
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '25px PT Serif';
-        ctx.fillText(` ${todayString}`, 418, 740); // Adjust coordinates as needed
-        ctx.fillText(` ${endDateString}`, 788, 740); // Adjust coordinates as needed
+        image.onload = () => {
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#3d464f';
+            ctx.font = '50px PT Serif';
+            ctx.fillText(` ${applicantName}`, 500, 300);
+            ctx.font = 'bold 23px PT Serif';
+            ctx.fillText(` ${lawyerName}`, 680, 500);
+            ctx.font = 'bold 33px PT Serif';
+            ctx.fillText(` ${judgeName}`, 300, 550);
+            ctx.font = '25px PT Serif';
+            ctx.fillText(` ${bsn}`, 10, 990);
+            ctx.fillText(` ${today}`, 418, 740);
+        };
 
         // Convert canvas content to a PNG data URL
         const imageDataUrl = canvas.toDataURL('image/png');
@@ -233,15 +187,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
