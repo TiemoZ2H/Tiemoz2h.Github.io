@@ -20,9 +20,11 @@
     </form>
     
     <canvas id="canvas" width="800" height="600" style="display:none;"></canvas>
+    <div id="linkContainer" style="display:none;">
+        <a id="uploadedImageLink" target="_blank">Klik hier om de geüploade afbeelding te bekijken</a>
+    </div>
 
     <script>
-
 document.getElementById('uploadForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -79,14 +81,20 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
             .then(data => {
                 console.log('Afbeelding geüpload:', data);
                 alert('Afbeelding geüpload: ' + data.url);
+                // Toon de link naar de afbeelding
+                const linkContainer = document.getElementById('linkContainer');
+                const uploadedImageLink = document.getElementById('uploadedImageLink');
+                uploadedImageLink.href = data.url;
+                linkContainer.style.display = 'block';
             })
             .catch(error => {
                 console.error('Fout bij uploaden:', error);
-                alert('Upload mislukt')
+                alert('Upload mislukt');
             });
         };
+        img.src = event.target.result;
     };
+    reader.readAsDataURL(backgroundFile);
 });
     </script>
 </body>
-</html>
