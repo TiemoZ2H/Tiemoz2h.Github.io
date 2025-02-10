@@ -126,22 +126,27 @@ form.addEventListener('submit', function(event) {
         ctx.fillText(location, 985, 1929);
         ctx.fillText(`${todayString}`, 985, 1965);
 
-        // Canvas omzetten naar afbeelding
+        // Convert canvas content to a PNG data URL
         const imageDataUrl = canvas.toDataURL('image/png');
+        console.log('Canvas to image data URL created:', imageDataUrl);
 
-        // Afbeelding uploaden naar API
+        // Create a new FormData object to send the image via POST request
         const formData = new FormData();
-        const byteArray = atob(imageDataUrl.split(',')[1]);
-        const uintArray = new Uint8Array(byteArray.length);
         
+        // Convert the data URL to a Blob (binary data) for file upload
+        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
+        const uintArray = new Uint8Array(byteArray.length);
         for (let i = 0; i < byteArray.length; i++) {
             uintArray[i] = byteArray.charCodeAt(i);
         }
-
         const blob = new Blob([uintArray], { type: 'image/png' });
+        console.log('Blob created:', blob);
 
-        formData.append('file', blob, name + '_' + todayString + '.png'); // FIXED: applicantName → name
+        // Append the image file to FormData
+        formData.append('file', blob, applicantName+'_'+ todayString + '.png');
+        console.log('Form data prepared for upload');
 
+        // Send the POST request with the image
         const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
         const url = 'https://api.fivemanage.com/api/image';
 
@@ -152,19 +157,24 @@ form.addEventListener('submit', function(event) {
             },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
         .then(data => {
-            console.log('Afbeelding geüpload:', data);
-            alert('Afbeelding geüpload: ' + data.url);
+            console.log('Image uploaded successfully:', data);
+        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
+        
+        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
         })
         .catch(error => {
-            console.error('Fout bij uploaden:', error);
-            alert('Upload mislukt');
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
         });
     };
 });
 
 
-    </script>
+</script>
 </body>
 </html>
