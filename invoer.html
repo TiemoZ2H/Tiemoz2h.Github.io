@@ -104,57 +104,67 @@
         const todayString = today.toLocaleDateString();
 
         
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            overlay.style.display = 'none';
-            
-            const imageUrl = document.getElementById('imageUrl').value;
-            const name = document.getElementById('name').value;
-            const location = document.getElementById('location').value;
-            
-            const image = new Image();
-            image.src = imageUrl;
-            
-            image.onload = () => {
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = 'Black';
-                ctx.font = '50px Lucida Handwriting';
-                ctx.fillText(name, 930, 2076);
-                
-                ctx.font = '30px Arial';
-                ctx.fillText(location, 985, 1929);
-                ctx.fillText(`${todayString}`, 985, 1965);
-                uploadImage();
-            };
-        });
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    overlay.style.display = 'none';
+    
+    const imageUrl = document.getElementById('imageUrl').value;
+    const name = document.getElementById('name').value;
+    const location = document.getElementById('location').value;
+    
+    const image = new Image();
+    image.src = imageUrl;
+    
+    image.onload = () => {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
         
-        function uploadImage() {
-            const imageDataUrl = canvas.toDataURL('image/png');
-            const byteArray = atob(imageDataUrl.split(',')[1]);
-            const uintArray = new Uint8Array(byteArray.length);
-            for (let i = 0; i < byteArray.length; i++) {
-                uintArray[i] = byteArray.charCodeAt(i);
-            }
-            const blob = new Blob([uintArray], { type: 'image/png' });
-            
-            const formData = new FormData();
-            formData.append('file', blob, 'signed_image.png');
-            
-            fetch('https://api.fivemanage.com/api/image', {
-                method: 'POST',
-                headers: { 'Authorization': 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv' },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Afbeelding geüpload: ' + data.url);
-            })
-            .catch(error => {
-                console.error('Fout bij uploaden:', error);
-                alert('Upload mislukt');
-            });
+        ctx.fillStyle = 'Black';
+        ctx.font = '50px Lucida Handwriting';
+        ctx.fillText(name, 930, 2076);
+        
+        ctx.font = '30px Arial';
+        ctx.fillText(location, 985, 1929);
+        ctx.fillText(`${todayString}`, 985, 1965);
+
+        // Canvas omzetten naar afbeelding
+        const imageDataUrl = canvas.toDataURL('image/png');
+
+        // Afbeelding uploaden naar API
+        const formData = new FormData();
+        const byteArray = atob(imageDataUrl.split(',')[1]);
+        const uintArray = new Uint8Array(byteArray.length);
+        
+        for (let i = 0; i < byteArray.length; i++) {
+            uintArray[i] = byteArray.charCodeAt(i);
         }
+
+        const blob = new Blob([uintArray], { type: 'image/png' });
+
+        formData.append('file', blob, name + '_' + todayString + '.png'); // FIXED: applicantName → name
+
+        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+        const url = 'https://api.fivemanage.com/api/image';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Afbeelding geüpload:', data);
+            alert('Afbeelding geüpload: ' + data.url);
+        })
+        .catch(error => {
+            console.error('Fout bij uploaden:', error);
+            alert('Upload mislukt');
+        });
+    };
+});
+
+
     </script>
 </body>
 </html>
