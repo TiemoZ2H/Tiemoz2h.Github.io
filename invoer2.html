@@ -1,189 +1,121 @@
+
+
+Verify
+Copy code
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Overlay Form</title>
+    <title>Canvas Upload</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
-            text-align: center;
-            margin: 0;
-            padding: 0;
+        #canvas {
+            border: 1px solid black;
         }
-
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        #overlayForm {
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px auto;
-            width: 60%;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        #overlayForm label {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
-            text-align: left;
-        }
-
-        #overlayForm input {
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
         }
-
-        #overlayForm button {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            font-size: 1.2em;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
- 
-        #overlayForm button:hover {
-            background-color: #45a049;
-        }
-
-        canvas {
-            border: 1px solid #ccc;
-            margin-top: 30px;
-            background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            #overlayForm {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
+        #form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
-<h1>Jachtakte uitgaven form</h1>
-<form id="overlayForm">
-    <label for="backgroundUrl">Achtergrondafbeelding URL:</label>
-    <input type="text" id="backgroundUrl" required>
+<canvas id="canvas" width="800" height="600"></canvas>
+<div id="overlay">
+    <div id="form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <br>
+        <label for="location">Location:</label>
+        <input type="text" id="location" required>
+        <br>
+        <button id="submit">Submit</button>
+    </div>
+</div>
 
-    <label for="applicantName">Uitgegeven aan:</label>
-    <input type="text" id="applicantName" required>
+<button id="openForm">Open Form</button>
 
-    <label for="lawyerName">Advocaat:</label>
-    <input type="text" id="lawyerName" required>
-
-    <label for="bsn">Burger service nummer:</label>
-    <input type="text" id="bsn" required>
-
-    <label for="judgeName">Rechter:</label>
-    <input type="text" id="judgeName" value="Felix Keizer" required>
-
-    <button type="submit">Maak Nieuwe Akte</button>
-</form>
-
-<canvas id="imageCanvas" width="1200" height="1000"></canvas>
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    const form = document.getElementById('overlayForm');
-    const canvas = document.getElementById('imageCanvas');
+    const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+    const overlay = document.getElementById('overlay');
+    const openFormButton = document.getElementById('openForm');
+    const submitButton = document.getElementById('submit');
 
-        const backgroundUrl = document.getElementById('backgroundUrl').value;
-        const applicantName = document.getElementById('applicantName').value;
-        const lawyerName = document.getElementById('lawyerName').value.toUpperCase();
-        const bsn = document.getElementById('bsn').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer";
-        const today = new Date().toLocaleDateString();
-        
-        const image = new Image();
-        image.crossOrigin = "anonymous";
-        image.src = backgroundUrl;
+    const backgroundImageUrl = 'https://example.com/path/to/your/image.png'; // Replace with your image URL
 
-        image.onload = () => {
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#3d464f';
-            ctx.font = '50px PT Serif';
-            ctx.fillText(` ${applicantName}`, 500, 300);
-            ctx.font = 'bold 23px PT Serif';
-            ctx.fillText(` ${lawyerName}`, 680, 500);
-            ctx.font = 'bold 33px PT Serif';
-            ctx.fillText(` ${judgeName}`, 300, 550);
-            ctx.font = '25px PT Serif';
-            ctx.fillText(` ${bsn}`, 10, 990);
-            ctx.fillText(` ${today}`, 418, 740);
-        };
+    // Load the background image
+    const backgroundImage = new Image();
+    backgroundImage.src = backgroundImageUrl;
+    backgroundImage.onload = () => {
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+    };
 
-        // Convert canvas content to a PNG data URL
-        const imageDataUrl = canvas.toDataURL('image/png');
-        console.log('Canvas to image data URL created:', imageDataUrl);
+    // Open the form overlay
+    openFormButton.addEventListener('click', () => {
+        overlay.style.display = 'flex';
+    });
 
-        // Create a new FormData object to send the image via POST request
-        const formData = new FormData();
-        
-        // Convert the data URL to a Blob (binary data) for file upload
-        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
-        const uintArray = new Uint8Array(byteArray.length);
-        for (let i = 0; i < byteArray.length; i++) {
-            uintArray[i] = byteArray.charCodeAt(i);
-        }
-        const blob = new Blob([uintArray], { type: 'image/png' });
-        console.log('Blob created:', blob);
+    // Handle form submission
+    submitButton.addEventListener('click', () => {
+        const name = document.getElementById('name').value;
+        const location = document.getElementById('location').value;
 
-        // Append the image file to FormData
-        formData.append('file', blob, applicantName+'_'+ todayString + '.png');
-        console.log('Form data prepared for upload');
+        // Draw the text on the canvas
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // Redraw background
+        ctx.fillStyle = 'white';
+        ctx.font = '30px Arial';
+        ctx.fillText(`Name: ${name}`, 50, 50);
+        ctx.fillText(`Location: ${location}`, 50, 100);
 
-        // Send the POST request with the image
+        // Convert canvas to image and upload
+        const dataURL = canvas.toDataURL('image/png');
+        uploadImage(dataURL);
+
+        overlay.style.display = 'none'; // Close the overlay
+    });
+
+    // Function to upload the image
+    function uploadImage(dataURL) {
         const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
         const url = 'https://api.fivemanage.com/api/image';
 
-        fetch(url, {
-            method: 'POST',
+        // Convert base64 to binary
+        const base64Data = dataURL.split(',')[1];
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        const formData = new FormData();
+        formData.append('file', new Blob([buffer], { type: 'image/png' }), 'canvas-image.png');
+        formData.append("metadata", JSON.stringify({
+            name: 'My image',
+            description: 'This is my image',
+        }));
+
+        axios.post(url, formData, {
             headers: {
-                'Authorization': apiKey,
-            },
-            body: formData
-        })
-        .then(response => {
-            console.log('Response received:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Image uploaded successfully:', data);
-        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
-        
-        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-            alert('Failed to upload image');
+                Authorization: apiKey,
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(res => {
+            console.log(res.data.url);
+        }).catch(err => {
+            console.error(err);
         });
-    });
+    }
 </script>
+
 </body>
 </html>
