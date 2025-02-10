@@ -14,42 +14,48 @@
             padding: 0;
         }
 
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-top: 20px;
-            font-weight: bold;
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #overlayForm {
             background-color: #fff;
             padding: 20px;
-            margin: 20px auto;
-            width: 60%;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        #overlayForm label {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
             text-align: left;
+            width: 300px;
         }
 
-        #overlayForm input {
+        label {
+            font-size: 1em;
+            color: #555;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 10px;
+            margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1em;
             box-sizing: border-box;
         }
 
-        #overlayForm button {
-            padding: 12px 25px;
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
             background-color: #4CAF50;
             color: #fff;
             border: none;
@@ -59,7 +65,7 @@
             transition: background-color 0.3s ease;
         }
 
-        #overlayForm button:hover {
+        button:hover {
             background-color: #45a049;
         }
 
@@ -69,119 +75,83 @@
             background-color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            #overlayForm {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-        }
     </style>
 </head>
 <body>
-
-<h1> Arbeidsovereenkomst </h1>
-<form id="overlayForm">
-    <label for="baseImageUrl">Afbeeldings-URL:</label>
-    <input type="text" id="baseImageUrl" >
-
-    <label for="applicantName">Naam:</label>
-    <input type="text" id="applicantName" >
-
-    <label for="lawyerName">Teken Adres:</label>
-    <input type="text" id="lawyerName" >
-    <button type="submit">Maak Nieuwe Akte</button>
-</form>
-<canvas id="imageCanvas" width="1654" height="2339"></canvas>
-
-<script>
-    const canvas = document.getElementById('imageCanvas');
-    const ctx = canvas.getContext('2d');
-    const baseImage = new Image();
-    const form = document.getElementById('overlayForm');
-
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const baseImageUrl = document.getElementById('baseImageUrl').value;
-        const applicantName = document.getElementById('applicantName').value.trim();
-        const lawyerName = document.getElementById('lawyerName').value.trim();
-        const today = new Date();
-        const todayString = today.toLocaleDateString().replace(/\//g, "-"); // Vervang / door - in datum
-
-        baseImage.src = baseImageUrl;
-        
-        baseImage.onload = () => {
-            console.log('Afbeelding geladen.');
-
-            // Canvas leegmaken voordat je een nieuwe afbeelding tekent
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Afbeelding tekenen op canvas
-            ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
-
-            // Tekst toevoegen
-            ctx.font = "bold 50px PT Serif";
-            ctx.fillStyle = "black"; // Zorg ervoor dat de tekst zichtbaar is
-            ctx.fillText(applicantName, 984, 2076);
+    <div id="overlay">
+        <form id="overlayForm">
+            <label for="imageUrl">Afbeelding URL:</label>
+            <input type="url" id="imageUrl" required>
             
-            ctx.font = "30px Arial";
-            ctx.fillText(lawyerName, 984, 1930);
-            ctx.fillText(`${todayString}`, 986, 1966);
-
-            // Nu pas de afbeelding omzetten naar een bestand
-            setTimeout(uploadImage, 0);
-        };
-    });
-
-    function uploadImage() {
-        // Canvas omzetten naar PNG
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                console.error('Kon geen blob maken.');
-                alert('Fout bij het genereren van de afbeelding.');
-                return;
+            <label for="name">Naam:</label>
+            <input type="text" id="name" required>
+            
+            <label for="location">Locatie van ondertekening:</label>
+            <input type="text" id="location" required>
+            
+            <button type="submit">Verwerken</button>
+        </form>
+    </div>
+    
+    <canvas id="imageCanvas" width="1654" height="2339" style="display: none;"></canvas>
+    
+    <script>
+        const overlay = document.getElementById('overlay');
+        const form = document.getElementById('overlayForm');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            overlay.style.display = 'none';
+            
+            const imageUrl = document.getElementById('imageUrl').value;
+            const name = document.getElementById('name').value;
+            const location = document.getElementById('location').value;
+            
+            const image = new Image();
+            image.src = imageUrl;
+            
+            image.onload = () => {
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#3d464f';
+                ctx.font = '50px Arial';
+                ctx.fillText(name, 100, 900);
+                
+                ctx.font = '30px Arial';
+                ctx.fillText(location, 100, 950);
+                
+                uploadImage();
+            };
+        });
+        
+        function uploadImage() {
+            const imageDataUrl = canvas.toDataURL('image/png');
+            const byteArray = atob(imageDataUrl.split(',')[1]);
+            const uintArray = new Uint8Array(byteArray.length);
+            for (let i = 0; i < byteArray.length; i++) {
+                uintArray[i] = byteArray.charCodeAt(i);
             }
-
-            console.log('Blob aangemaakt:', blob);
-
-            // FormData object aanmaken
+            const blob = new Blob([uintArray], { type: 'image/png' });
+            
             const formData = new FormData();
-            const applicantName = document.getElementById('applicantName').value.trim();
-            const todayString = new Date().toLocaleDateString().replace(/\//g, "-");
-            const fileName = applicantName + "_" + todayString + ".png";
-
-            formData.append('file', blob, fileName);
-            console.log('FormData aangemaakt:', formData);
-
-            // API-key en URL
-            const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-            const url = 'https://api.fivemanage.com/api/image';
-
-            // Fetch request om afbeelding te uploaden
-            fetch(url, {
+            formData.append('file', blob, 'signed_image.png');
+            
+            fetch('https://api.fivemanage.com/api/image', {
                 method: 'POST',
-                headers: {
-                    'Authorization': apiKey
-                },
+                headers: { 'Authorization': 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv' },
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Upload geslaagd:', data);
-                alert('Afbeelding geüpload! URL: ' + data.url);
+                alert('Afbeelding geüpload: ' + data.url);
             })
             .catch(error => {
                 console.error('Fout bij uploaden:', error);
-                alert('Fout bij uploaden van afbeelding.');
+                alert('Upload mislukt');
             });
-
-        }, 'image/png');
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
