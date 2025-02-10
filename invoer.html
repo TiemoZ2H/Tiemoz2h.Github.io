@@ -100,6 +100,9 @@
         const form = document.getElementById('overlayForm');
         const canvas = document.getElementById('imageCanvas');
         const ctx = canvas.getContext('2d');
+        const today = new Date();
+        const todayString = today.toLocaleDateString();
+
         
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -115,13 +118,13 @@
             image.onload = () => {
                 ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
                 
-                ctx.fillStyle = '#3d464f';
-                ctx.font = '50px Arial';
-                ctx.fillText(name, 100, 900);
+                ctx.fillStyle = 'Black';
+                ctx.font = '50px Lucida Handwriting';
+                ctx.fillText(name, 930, 2076);
                 
                 ctx.font = '30px Arial';
-                ctx.fillText(location, 100, 950);
-                
+                ctx.fillText(location, 985, 1929);
+                ctx.fillText(`${todayString}`, 985, 1965);
                 uploadImage();
             };
         });
