@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://jouwsite.com;">
     <title>Image Overlay Form</title>
     <style>
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             font-family: 'Arial', sans-serif;
             background-color: #f4f7fc;
             color: #333;
             text-align: center;
-            margin: 0;
-            padding: 0;
             position: relative;
         }
 
@@ -23,7 +27,7 @@
         }
 
         #overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -43,41 +47,14 @@
             text-align: center;
         }
 
-        #overlayForm label {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
-            text-align: left;
-        }
-
-        #overlayForm input {
-            width: 100%;
+        #overlayForm input, #overlayForm button {
+            width: 80%;
             padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
+            margin-top: 10px;
         }
 
-        #overlayForm button {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            font-size: 1.2em;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #overlayForm button:hover {
-            background-color: #45a049;
-        }
-
-      
         #mainForm {
+            display: none;
             background-color: #fff;
             padding: 20px;
             margin: 20px auto;
@@ -86,47 +63,14 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        #mainForm label {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
-            text-align: left;
-        }
-
-        #mainForm input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        #mainForm button {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            font-size: 1.2em;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
- 
-        #mainForm button:hover {
-            background-color: #45a049;
-        }
-
         canvas {
             border: 1px solid #ccc;
             margin-top: 30px;
             background-color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             #overlayForm {
                 width: 90%;
@@ -144,12 +88,12 @@
     <div id="overlayForm">
         <label for="password">Enter Password:</label>
         <input type="text" id="password" placeholder="Password">
-        <button id="submitPassword">ga door</button>
+        <button id="submitPassword">Ga door</button>
     </div>
 </div>
 
 <h1> Arbeidsovereenkomst</h1>
-<form id="mainForm" style="display: none;">
+<form id="mainForm">
     <label for="applicantName">Naam Personeel:</label>
     <input type="text" id="applicantName">
 
@@ -162,57 +106,30 @@
     <button type="submit">Maak nieuw contract aan</button>
 </form>
 
-<canvas id="imageCanvas" width="1654" height="2339" style="display: none;"></canvas>
+<canvas id="imageCanvas" width="1654" height="2339"></canvas>
 
 <script>
-
-const overlay = document.getElementById('overlay');
-const passwordInput = document.getElementById('password');
-const submitPasswordButton = document.getElementById('submitPassword');
-const mainForm = document.getElementById('mainForm');
-const canvas = document.getElementById('imageCanvas');
-const ctx = canvas.getContext('2d');
-const baseImage = new Image();
-const overlayImage = new Image();
-const today = new Date();
-const todayString = today.toLocaleDateString();
-
-// Event listener voor wachtwoord invoer
-submitPasswordButton.addEventListener('click', function () {
-    const password = passwordInput.value.trim();
-
-    if (password === '') {
-        // Als het wachtwoord leeg is, stuur de gebruiker door
-        window.location.href = "invoer.html";
-        return;
+    if (window.self !== window.top) {
+        console.log("Deze pagina draait in een iframe");
     }
 
-    if (password === 'WeedW' || password === 'Chengs') {
-        baseImage.src = 'Algemene-Arbeidsovereenkomst.png';
-        overlayImage.src = password === 'WeedW' ? 'weedworld.png' : 'cheng_wokroll.png';
-
-        let baseLoaded = false;
-        let overlayLoaded = false;
-
-        baseImage.onload = () => {
-            baseLoaded = true;
-            if (overlayLoaded) drawContent(password);
-        };
-
-        overlayImage.onload = () => {
-            overlayLoaded = true;
-            if (baseLoaded) drawContent(password);
-        };
-
-        // Verberg de overlay en toon het formulier + canvas pas na het invullen van het wachtwoord
-        overlay.style.display = 'none';
-        mainForm.style.display = 'block';
-        canvas.style.display = 'block';
-    } else {
-        // Stuur de gebruiker naar een andere pagina bij fout wachtwoord
-        window.location.href = "invoer.html";
-    }
-});
+    const overlay = document.getElementById('overlay');
+    const passwordInput = document.getElementById('password');
+    const submitPasswordButton = document.getElementById('submitPassword');
+    const mainForm = document.getElementById('mainForm');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    submitPasswordButton.addEventListener('click', function () {
+        const password = passwordInput.value.trim();
+        if (password === 'WeedW' || password === 'Chengs') {
+            overlay.style.display = 'none';
+            mainForm.style.display = 'block';
+            canvas.style.display = 'block';
+        } else {
+            window.location.href = "invoer.html";
+        }
+    });
 
 function drawContent(password) {
     console.log('Afbeeldingen geladen, nu tekenen.');
