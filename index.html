@@ -1,223 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors *;">
-    <title>Image Overlay Form</title>
+    <title>3x2 Grid Knoppen</title>
     <style>
-        html, body {
-            width: 100%;
-            height: 100%;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            height: 100vh;
+            width: calc(100vw - 40px);
+            gap: 10px;
+            background: linear-gradient(180deg, #d1d1d1, #d1d1d1);
+            padding: 5%;
+            
+        }
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
             overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
-            text-align: center;
-            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-top: 20px;
-            font-weight: bold;
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(180deg, #d1d1d1, #5f5f5f);
         }
-
-        #overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .button img {
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #overlayForm {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        #overlayForm input, #overlayForm button {
-            width: 80%;
-            padding: 12px;
-            margin-top: 10px;
-        }
-
-        #mainForm {
-            display: none;
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px auto;
-            width: 60%;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        canvas {
-            border: 1px solid #ccc;
-            margin-top: 30px;
-            background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            #overlayForm {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
+            object-fit: contain;
         }
     </style>
 </head>
 <body>
-
-<div id="overlay">
-    <div id="overlayForm">
-        <label for="password">Enter Password:</label>
-        <input type="text" id="password" placeholder="Password">
-        <button id="submitPassword">Ga door</button>
-    </div>
-</div>
-
-<h1> Arbeidsovereenkomst</h1>
-<form id="mainForm">
-    <label for="applicantName">Naam Personeel:</label>
-    <input type="text" id="applicantName">
-
-    <label for="bsn">Geboorte datum:</label>
-    <input type="text" id="bsn" placeholder=" DD/MM/JJJJ">
-
-    <label for="judgeName">Functie in het bedrijf: </label>
-    <input type="text" id="judgeName">
-
-    <button type="submit">Maak nieuw contract aan</button>
-</form>
-
-<canvas id="imageCanvas" width="1654" height="2339"></canvas>
-
-<script>
-    if (window.self !== window.top) {
-        alert("Deze pagina draait in een iframe");
-    }
-
-    const overlay = document.getElementById('overlay');
-    const passwordInput = document.getElementById('password');
-    const submitPasswordButton = document.getElementById('submitPassword');
-    const mainForm = document.getElementById('mainForm');
-    const canvas = document.getElementById('imageCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    submitPasswordButton.addEventListener('click', function () {
-        const password = passwordInput.value.trim();
-        if (password === 'WeedW' || password === 'Chengs') {
-            overlay.style.display = 'none';
-            mainForm.style.display = 'block';
-            canvas.style.display = 'block';
-        } else {
-            window.location.href = "invoer.html";
-        }
-    });
-
-function drawContent(password) {
-    console.log('Afbeeldingen geladen, nu tekenen.');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(overlayImage, 1200, 100, 300, password === 'WeedW' ? 250 : 300);
-
-    ctx.fillStyle = 'Black';
-    ctx.font = '30px Arial';
-
-    if (password === 'WeedW') {
-        ctx.fillText(`Weed World`, 195, 242);
-        ctx.fillText(`Hawick Avenue 312, Los Santos`, 195, 278);
-        ctx.fillText(`C. de Witte`, 195, 418);
-        ctx.fillText(`Hawick Avenue 312, Los Santos`, 205, 1929);
-        ctx.fillText(`${todayString}`, 205, 1965);
-        ctx.fillText(`${todayString}`, 430, 876);
-        ctx.font = 'italic 50px "Brush Script MT", cursive';
-        ctx.fillText('C. de Witte', 129, 2076);
-    } else if (password === 'Chengs') {
-        ctx.fillText(`Cheng's Wok & Roll`, 195, 242);
-        ctx.fillText(`Palomino Avenue 1221, Los Santos`, 195, 278);
-        ctx.fillText(`W. Cheng`, 195, 418);
-        ctx.fillText(`Palomino Avenue 1221, Los Santos`, 205, 1929);
-        ctx.fillText(`${todayString}`, 205, 1965);
-        ctx.fillText(`${todayString}`, 430, 876);
-        ctx.font = 'italic 50px "Brush Script MT", cursive';
-        ctx.fillText('W. Cheng', 129, 2076);
-    }
-}
-
-// **Formulier Submit Event**
-mainForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    console.log('Formulier verzonden');
-
-    const applicantName = document.getElementById('applicantName').value;
-    const bsn = document.getElementById('bsn').value;
-    const judgeName = document.getElementById('judgeName').value;
-
-    // Tekst plaatsen op canvas
-    ctx.fillStyle = 'Black';
-    ctx.font = '30px Arial';
-    ctx.fillText(applicantName, 195, 560);
-    ctx.fillText("-", 195, 596);
-    ctx.fillText(bsn, 323, 630);
-
-    ctx.fillStyle = 'Black';
-    ctx.font = 'bold 30px Arial';
-    ctx.fillText(judgeName, 509, 911);
-
-    // Canvas omzetten naar afbeelding
-    const imageDataUrl = canvas.toDataURL('image/png');
-
-    // Afbeelding uploaden naar API
-    const formData = new FormData();
-    const byteArray = atob(imageDataUrl.split(',')[1]);
-    const uintArray = new Uint8Array(byteArray.length);
-    for (let i = 0; i < byteArray.length; i++) {
-        uintArray[i] = byteArray.charCodeAt(i);
-    }
-    const blob = new Blob([uintArray], { type: 'image/png' });
-
-    const Newname= applicantName;
-    const nospacename= Newname.split(' ').join('');
-
-    formData.append('file', blob, nospacename + '_' + todayString + '.png');
-
-    const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-    const url = 'https://api.fivemanage.com/api/image';
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': apiKey,
-        },
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Afbeelding geüpload:', data);
-            alert('Afbeelding geüpload: ' + data.url);
-        })
-        .catch(error => {
-            console.error('Fout bij uploaden:', error);
-            alert('Upload mislukt');
-        });
-});
-</script>
+    <a href="Weedworld.html" class="button"><img src="weedworld.png" alt="Knop 1"></div>
+    <a href="Chengs.html" class="button"><img src="cheng_wokroll.png" alt="Knop 2"></div>
+    <a href="Dynasty.html" class="button"><img src="Dynasty8.webp" alt="Knop 3"></div>
+    <a href="Weazel.html" class="button"><img src="WeazelNews.webp" alt="Knop 5"></div>
 </body>
 </html>
