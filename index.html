@@ -20,7 +20,6 @@
             gap: 10px;
             background: linear-gradient(180deg, #d1d1d1, #d1d1d1);
             padding: 5%;
-            
         }
         .button {
             display: flex;
@@ -43,11 +42,21 @@
             object-fit: contain;
         }
     </style>
+    <script>
+        function checkPassword(url, correctPassword) {
+            var password = prompt("Voer het wachtwoord in:");
+            if (password === correctPassword) {
+                window.location.href = url;
+            } else {
+                alert("Onjuist wachtwoord. Probeer het opnieuw.");
+            }
+        }
+    </script>
 </head>
 <body>
-    <a href="Weedworld.html" class="button"><img src="weedworld.png" alt="Knop 1"></div>
-    <a href="Chengs.html" class="button"><img src="cheng_wokroll.png" alt="Knop 2"></div>
-    <a href="Dynasty.html" class="button"><img src="Dynasty8.webp" alt="Knop 3"></div>
-    <a href="Weazel.html" class="button"><img src="WeazelNews.webp" alt="Knop 5"></div>
+    <div class="button" onclick="checkPassword('Weedworld.html', 'W&&DW0RID1!')"><img src="weedworld.png" alt="Knop 1"></div>
+    <div class="button" onclick="checkPassword('Chengs.html', 'Ch1n@Numb3r1!')"><img src="cheng_wokroll.png" alt="Knop 2"></div>
+    <div class="button" onclick="checkPassword('Dynasty.html', 'Makelaar0WNER')"><img src="Dynasty8.webp" alt="Knop 3"></div>
+    <div class="button" onclick="checkPassword('Weazel.html', 'WE@ZEL')"><img src="WeazelNews.webp" alt="Knop 5"></div>
 </body>
 </html>
