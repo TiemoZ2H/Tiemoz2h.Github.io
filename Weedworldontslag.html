@@ -83,12 +83,11 @@
     </style>
 
 <h1> Arbeidsovereenkomst</h1>
-<button class="redirect-button" onclick="window.location.href='Weedworldontslag.html'">Go to Target Page</button>
 <form id="overlayForm">
     <label for="Naam">Naam Personeel:</label>
     <input type="text" id="Naam">
 
-    <label for="Functie">Functie in het bedrijf: </label>
+    <label for="Functie">Reden voor ontslag: </label>
     <input type="text" id="Functie">
 
     <button type="submit">Maak nieuw contract</button>
@@ -101,7 +100,7 @@
     const canvas = document.getElementById('imageCanvas');
     const ctx = canvas.getContext('2d');
     const image = new Image();
-    image.src = 'WeedWorldArbeid.png'; // Replace with the path to your image
+    image.src = 'WeedWorldOntslag.png'; // Replace with the path to your image
 
     image.onload = () => {
         console.log('Image loaded successfully');
@@ -122,14 +121,15 @@
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
 
        // Set text properties
-       ctx.font = "bold 30px Arial";
+       ctx.font = "bold 40px Arial";
             ctx.fillStyle = "Black";
-            ctx.fillText(todayString, 1510, 905);
-            ctx.fillText(todayString, 595 ,1022);
-            ctx.font = "90px Lucida Handwriting";
-            ctx.fillText(Naam, 600, 700);
-            ctx.font = "bold 30px Arial";
-            ctx.fillText(Functie, 542, 1066);
+            ctx.fillText(todayString, 305, 713);
+        ctx.font = " 45px Arial";    
+            ctx.fillText(todayString, 855 ,1300);
+           
+            ctx.fillText(Naam + ',', 320, 920);
+            ctx.font = " 45px Arial";
+            ctx.fillText(Functie, 886, 1174);
             
             
 
