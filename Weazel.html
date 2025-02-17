@@ -91,8 +91,11 @@
     <input type="text" id="Functie">
 
     <button type="submit">Maak nieuw contract</button>
-</form>
 
+</form>
+<form id="overlayForm">
+<button type="button" id="addDateButton">Tijdelijk Contract</button>
+</form>
 <canvas id="imageCanvas" width="2121" height="3000"></canvas>
 
 <script>
@@ -101,6 +104,24 @@
     const ctx = canvas.getContext('2d');
     const image = new Image();
     image.src = 'WeazelNews.png'; // Replace with the path to your image
+
+    document.getElementById('addDateButton').addEventListener('click', function () {
+    console.log('Add date button clicked');
+
+    // Calculate date 4 weeks from today
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 28);
+    const futureDateString = futureDate.toLocaleDateString();
+
+    // Draw a white rectangle as a background for the text
+    ctx.fillStyle = "white";
+    ctx.fillRect(1280, 1100, 500, 100); // Adjust position and size as needed
+
+    // Add the future date on top of the white rectangle
+    ctx.font = "bold 40px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText( "tot :" +futureDateString, 1288 ,1178); // Adjust position as needed
+});
 
     image.onload = () => {
         console.log('Image loaded successfully');
