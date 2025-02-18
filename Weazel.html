@@ -127,7 +127,8 @@
         console.log('Image loaded successfully');
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
-
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
+    
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         console.log('Form submitted');
@@ -139,7 +140,7 @@
 
        
 
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
+        
 
        // Set text properties
        ctx.font = "bold 40px Arial";
