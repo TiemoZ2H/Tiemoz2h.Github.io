@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Overlay Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #overlayForm {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #overlayForm label {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+        }
+
+        #overlayForm input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        #overlayForm button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 1.2em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #overlayForm button:hover {
+            background-color: #45a049;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            #overlayForm {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Jachtakte uitgaven form</h1>
+<form id="overlayForm">
+    <label for="applicantName">Uitgegeven aan:</label>
+    <input type="text" id="applicantName" required>
+
+    <label for="judgeName">Rechter:</label>
+    <input type="text" id="judgeName" value="Felix Keizer" required>
+
+    <button type="submit">Maak Nieuwe Akte</button>
+</form>
+
+<canvas id="imageCanvas" width="1920" height="1080"></canvas>
+
+<script>
+    const form = document.getElementById('overlayForm');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const image = new Image();
+    image.src = 'achtergrond.png'; // Replace with the path to your image
+
+    image.onload = () => {
+        console.log('Image loaded successfully');
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    };
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log('Form submitted');
+
+        const applicantName = document.getElementById('applicantName').value;
+        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
+        const today = new Date();
+        
+        // Extract the individual components from 'today'
+        const todayDay = String(today.getDate()).padStart(2, '0');
+        const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
+        const todayYear = today.getFullYear();
+
+        // Convert 'today' components to a string
+        const todayString = `${todayDay}  ${todayMonth}  ${todayYear}`;
+
+        // Calculate end date (28 days from today)
+        const endDate = new Date(today);
+        endDate.setDate(today.getDate() + 28);
+
+        // Extract the individual components from 'endDate'
+        const endDay = String(endDate.getDate()).padStart(2, '0');
+        const endMonth = String(endDate.getMonth() + 1).padStart(2, '0');
+        const endYear = endDate.getFullYear();
+
+        // Convert 'endDate' components to a string
+        const endDateString = `${endDay}  ${endMonth}  ${endYear}`;
+
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
+        
+        // Set text properties
+        ctx.fillStyle = 'Black';
+        ctx.font = '60px Lucida Handwriting';
+        
+        ctx.fillText(applicantName, 1320 , 930);
+        ctx.font = 'italic 80px "Brush Script MT", cursive'; 
+        ctx.fillStyle= 'red';
+        ctx.fillText(judgeName, 750, 930);
+
+        ctx.fillStyle = '#3d464f';
+        ctx.font = '50px PT Serif';
+        ctx.fillText(` ${todayString}`, 1500, 285); 
+        ctx.fillText(` ${endDateString}`, 1500, 350);
+
+         // Convert canvas content to a PNG data URL
+         const imageDataUrl = canvas.toDataURL('image/png');
+        console.log('Canvas to image data URL created:', imageDataUrl);
+
+        // Create a new FormData object to send the image via POST request
+        const formData = new FormData();
+        
+        // Convert the data URL to a Blob (binary data) for file upload
+        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
+        const uintArray = new Uint8Array(byteArray.length);
+        for (let i = 0; i < byteArray.length; i++) {
+            uintArray[i] = byteArray.charCodeAt(i);
+        }
+        const blob = new Blob([uintArray], { type: 'image/png' });
+        console.log('Blob created:', blob);
+
+        // Append the image file to FormData
+        formData.append('file', blob, "Jagersakte: " +applicantName+'_'+ todayString + '.png');
+        console.log('Form data prepared for upload');
+
+        // Send the POST request with the image
+        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
+        const url = 'https://api.fivemanage.com/api/image';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Image uploaded successfully:', data);
+        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
+        
+        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
+        })
+        .catch(error => {
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
+        });
+    });
+</script>
+</body>
+</html>
