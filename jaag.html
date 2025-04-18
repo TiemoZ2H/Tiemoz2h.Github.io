@@ -89,7 +89,7 @@
     <input type="text" id="applicantName" required>
 
     <label for="judgeName">Rechter:</label>
-    <input type="text" id="judgeName" value="Felix Keizer" required>
+    <input type="text" id="judgeName" value="Pabloïnca Bannanahammock" required>
 
     <button type="submit">Maak Nieuwe Akte</button>
 </form>
@@ -113,7 +113,7 @@
         console.log('Form submitted');
 
         const applicantName = document.getElementById('applicantName').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
+        const judgeName = document.getElementById('judgeName').value || "Pabloïnca Bannanahammock"; // Default to "Felix Keizer"
         const today = new Date();
         
         // Extract the individual components from 'today'
@@ -144,13 +144,28 @@
         
         ctx.fillText(applicantName, 1320 , 930);
         ctx.font = 'italic 80px "Brush Script MT", cursive'; 
-        ctx.fillStyle= 'red';
-        ctx.fillText(judgeName, 750, 930);
+        ctx.fillStyle = 'red';
+ctx.font = 'italic 80px "Brush Script MT", cursive';
+ctx.fillText(judgeName, 490, 920);
+
+// Measure text width
+const textMetrics = ctx.measureText(judgeName);
+const textX = 490;
+const textY = 930;
+
+// Draw underline
+ctx.beginPath();
+ctx.strokeStyle = 'black';
+ctx.lineWidth = 6; // thickness of the underline
+ctx.moveTo(textX, textY + -1); // 10px below baseline
+ctx.lineTo(textX + textMetrics.width +15 , textY + -1);
+ctx.stroke();
 
         ctx.fillStyle = '#3d464f';
         ctx.font = '50px PT Serif';
         ctx.fillText(` ${todayString}`, 1500, 285); 
         ctx.fillText(` ${endDateString}`, 1500, 350);
+
 
          // Convert canvas content to a PNG data URL
          const imageDataUrl = canvas.toDataURL('image/png');
