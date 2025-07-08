@@ -1,321 +1,190 @@
+<!-- OC.html met gekleurde knoppen en groep-accenten -->
 <!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Groepenbeheer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OC Pagina</title>
   <style>
-    :root {
-      --siv: #ffd500;   /* Geelachtig */
-      --motor: #ff0000; /* Roodachtig */
-      --zulu: #00ff00;  /* Groenachtig */
-      --light: #ffffff;
-      --text: #212529;
-      --primary: #007bff;
-      --danger: #dc3545;
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; }
+    header { margin-bottom: 20px; }
+    header a { text-decoration: none; color: #007bff; font-size: 16px; }
+    .search-container, .filter-buttons { margin-bottom: 20px; }
+    .search-container input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    .filter-buttons button {
+      margin-right: 8px; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; color: #fff;
     }
+    .filter-buttons .siv { background: #f0ad4e; }
+    .filter-buttons .motor { background: #5bc0de; }
+    .filter-buttons .zulu { background: #5cb85c; }
+    .filter-buttons .re { background: #337ab7; }
+    .filter-buttons .hovj { background: #d9534f; }
 
-    * {
-      box-sizing: border-box;
+    .personen-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .persoon { padding: 10px 15px; background: #fff; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; user-select: none; transition: background 0.2s, border-color 0.2s; }
+    .persoon.selected { background: #d4edda; border-color: #28a745; }
+    .persoon.hidden { display: none; }
+    #maakGroepBtn { margin-bottom: 20px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; display: none; }
+    #maakGroepBtn:hover { background: #218838; }
+
+    .groepen-container { display: flex; flex-wrap: wrap; gap: 10px; }
+    .groep-block {
+      background: #fff; border: 1px solid #ccc; border-radius: 8px;
+      padding: 10px; min-width: 200px; flex: 1; max-width: 250px; position: relative;
     }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f4f4f4;
-      color: var(--text);
+    .groep-block button {
+      position: absolute; top: 8px; right: 8px;
+      background: #dc3545; color: white; border: none;
+      border-radius: 4px; padding: 4px 6px; cursor: pointer; font-size: 12px;
     }
+    .groep-block strong { display: block; margin-bottom: 8px; font-size: 16px; }
+    .groep-specials { margin-top: 8px; font-size: 13px; color: #444; font-style: italic; }
 
-    h1 {
-      margin-bottom: 20px;
-      font-size: 28px;
-    }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .personen-container {
-      width: 300px;
-      background-color: var(--light);
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .zoekveld {
-      width: 100%;
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .persoon label {
-      display: block;
-      margin: 4px 0;
-      cursor: pointer;
-    }
-
-    .persoon input[type="checkbox"] {
-      margin-right: 6px;
-    }
-
-    button {
-      padding: 8px 12px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .groepen-container {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: flex-start;
-    }
-
-    .groep {
-      width: 300px;
-      background: var(--light);
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      transition: background 0.3s ease;
-    }
-
-    .groep.siv {
-      background: var(--siv);
-    }
-
-    .groep.motor {
-      background: var(--motor);
-    }
-
-    .groep.zulu {
-      background: var(--zulu);
-    }
-
-    .groep.multi-2 {
-  background: linear-gradient(to right, var(--siv), var(--motor));
-}
-
-.groep.multi-3 {
-  background: linear-gradient(to right, var(--siv), var(--motor), var(--zulu));
-}
-
-    .groep strong {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    .groep-lid {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #f1f1f1;
-      border-radius: 5px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-    }
-
-    .groep-lid button {
-      background-color: var(--danger);
-      font-size: 12px;
-      padding: 4px 8px;
-    }
-
-    .groep-lid button:hover {
-      background-color: #a51d2b;
-    }
-
-    @media (max-width: 900px) {
-      .groep {
-        width: 100%;
-      }
-
-      .personen-container {
-        width: 100%;
-      }
-    }
+    .accent-siv { border-color: #f0ad4e !important; background: #fcf8e3; }
+    .accent-motor { border-color: #5bc0de !important; background: #d9edf7; }
+    .accent-zulu { border-color: #5cb85c !important; background: #dff0d8; }
+    .accent-re { border-color: #337ab7 !important; background: #e9f2fa; }
+    .accent-hovj { border-color: #d9534f !important; background: #f2dede; }
   </style>
 </head>
 <body>
+  <header>
+    <a href="index.html">← Terug naar Home</a>
+  </header>
 
-  <h1>Groepenbeheer</h1>
+  <h1>OC-leden</h1>
 
-  <div class="container">
-    <!-- LINKERKANT: PERSONEN -->
-    <div class="personen-container">
-      <input type="text" class="zoekveld" id="zoekInput" placeholder="Zoek op naam of roepnummer" oninput="toonPersonen()" />
-      <div id="personenLijst"></div>
-      <button onclick="maakGroep()">➕ Maak groep</button>
-    </div>
-
-    <!-- RECHTERKANT: GROEPEN -->
-    <div id="groepenContainer" class="groepen-container"></div>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Zoek personen op naam of roepnummer">
   </div>
 
+  <div class="filter-buttons">
+    <button class="siv" data-tag="SIV">SIV</button>
+    <button class="motor" data-tag="Motor">MOTOR</button>
+    <button class="zulu" data-tag="Zulu">ZULU</button>
+    <button class="re" data-tag="Recherche">RE</button>
+    <button class="hovj" data-tag="HOVJ">HOVJ</button>
+  </div>
+
+  <div class="personen-container" id="personenContainer"></div>
+  <button id="maakGroepBtn">➕ Maak Groep</button>
+
+  <div class="groepen-container" id="groepenContainer"></div>
+
   <script>
-    const personen = [
-      { naam: "Ricky Blinders", roepnummer: "10-01", SIV: true, Motor: true, Zulu: true },
-      { naam: "Peter Garcia", roepnummer: "11-02", SIV: true, Motor: true, Zulu: false },
-      { naam: "Rowy Clegane", roepnummer: "11-03", SIV: true, Motor: true, Zulu: true },
-      { naam: "Eddy Ho", roepnummer: "13-15", SIV: false, Motor: false, Zulu: false },
-      { naam: "Thomas Houston", roepnummer: "14-14", SIV: false, Motor: true, Zulu: true },
-      { naam: "Finn Smith", roepnummer: "14-16", SIV: false, Motor: true, Zulu: true },
-      { naam: "Henk Flodder", roepnummer: "14-17", SIV: false, Motor: false, Zulu: false },
-      { naam: "Sophie Clegane", roepnummer: "15-49", SIV: false, Motor: true, Zulu: true },
-      { naam: "Elena Schmidt", roepnummer: "15-69", SIV: false, Motor: true, Zulu: false },
-      { naam: "stella Parker", roepnummer: "16-29", SIV: false, Motor: true, Zulu: false },
-      { naam: "Ali Korkmaz", roepnummer: "16-37", SIV: false, Motor: true, Zulu: true },
-      { naam: "Sander Lateralis", roepnummer: "16-45", SIV: false, Motor: true, Zulu: false },
-      { naam: "Dirk Fredericksen", roepnummer: "16-61", SIV: false, Motor: true, Zulu: true },
-      { naam: "Dao Druganov", roepnummer: "16-90", SIV: false, Motor: true, Zulu: false },
-      { naam: "Will Chase", roepnummer: "17-21", SIV: true, Motor: false, Zulu: false },
-      { naam: "Pieter Pepperspray", roepnummer: "17-23", SIV: false, Motor: false, Zulu: false },
-      { naam: "Betty Akkemaai", roepnummer: "17-24", SIV: true, Motor: true, Zulu: true },
-      { naam: "Hannah Parker", roepnummer: "17-25", SIV: false, Motor: false, Zulu: false },
-      { naam: "Dexter I. Kamaztoz", roepnummer: "17-30", SIV: false, Motor: false, Zulu: false },
-      { naam: "Chuck Answerman", roepnummer: "17-31", SIV: true, Motor: false, Zulu: false },
-      { naam: "Frank Daf", roepnummer: "17-59", SIV: false, Motor: false, Zulu: true },
-      { naam: "Martijn Klaasen", roepnummer: "17-82", SIV: false, Motor: false, Zulu: false },
-      { naam: "Donny Terpstra", roepnummer: "17-86", SIV: false, Motor: false, Zulu: false },
-      { naam: "Liam Torres", roepnummer: "17-87", SIV: false, Motor: false, Zulu: false },
-      { naam: "Hendrik Jansen", roepnummer: "17-89", SIV: false, Motor: false, Zulu: false },
-      { naam: "Loïs Torres", roepnummer: "17-92", SIV: false, Motor: false, Zulu: false },
-      { naam: "Aart van de Baan", roepnummer: "17-98", SIV: true, Motor: false, Zulu: false },
-      { naam: "Chiara Rossetti", roepnummer: "18-28", SIV: false, Motor: false, Zulu: false },
-      { naam: "Boer Tuin", roepnummer: "18-34", SIV: false, Motor: false, Zulu: false },
-      { naam: "Amelie de Groot", roepnummer: "18-36", SIV: false, Motor: false, Zulu: false },
-      { naam: "Marieke Piekee", roepnummer: "18-54", SIV: false, Motor: false, Zulu: false },
-      { naam: "Freddy Pauper", roepnummer: "18-70", SIV: false, Motor: false, Zulu: false },
-      { naam: "Christiano Zaneti", roepnummer: "18-83", SIV: false, Motor: false, Zulu: false },
-      { naam: "Sarah Lopez", roepnummer: "18-85", SIV: false, Motor: false, Zulu: false },
-      { naam: "Jantje Contantje", roepnummer: "18-94", SIV: false, Motor: false, Zulu: false },
-      { naam: "Ian Stone", roepnummer: "19-27", SIV: false, Motor: false, Zulu: false },
-      { naam: "Bibi Jordaan", roepnummer: "19-57", SIV: false, Motor: false, Zulu: false },
-      { naam: "Bowie Leo", roepnummer: "19-74", SIV: false, Motor: false, Zulu: false },
-      { naam: "Sam Martens", roepnummer: "19-75", SIV: false, Motor: false, Zulu: false },
-      { naam: "Remco Veldman", roepnummer: "19-79", SIV: false, Motor: false, Zulu: false },
-      { naam: "Scully Kolderkop", roepnummer: "19-80", SIV: false, Motor: false, Zulu: false },
-      { naam: "Max Azzip", roepnummer: "19-81", SIV: false, Motor: false, Zulu: false },
-      { naam: "Bill Ridder", roepnummer: "19-84", SIV: false, Motor: false, Zulu: false },
-      { naam: "Saar Croos", roepnummer: "19-88", SIV: false, Motor: false, Zulu: false },
-      { naam: "Wil de Woetroe", roepnummer: "19-95", SIV: false, Motor: false, Zulu: false },
-      { naam: "Rin Suzuki", roepnummer: "19-97", SIV: false, Motor: false, Zulu: false }
-    ];
+    document.addEventListener('DOMContentLoaded', () => {
+      const groepenContainer = document.getElementById('groepenContainer');
+      const personenContainer = document.getElementById('personenContainer');
+      const maakGroepBtn = document.getElementById('maakGroepBtn');
+      const searchInput = document.getElementById('searchInput');
 
-    const groepen = [];
+      let allLeden = [];
+      let leden = [];
+      let geselecteerd = new Set();
+      let groepen = [];
+      let filterAccent = '';
 
-    function getGebruiktePersonen() {
-      return groepen.flat();
-    }
-
-    function toonPersonen() {
-      const zoek = document.getElementById("zoekInput").value.toLowerCase();
-      const lijst = document.getElementById("personenLijst");
-      lijst.innerHTML = "";
-
-      const gebruikte = getGebruiktePersonen();
-
-      personen.forEach((p, i) => {
-        const isInGroep = gebruikte.some(gp => gp.roepnummer === p.roepnummer);
-        const zoekveld = `${p.naam} ${p.roepnummer}`.toLowerCase();
-
-        if (!isInGroep && zoekveld.includes(zoek)) {
-          lijst.innerHTML += `
-            <div class="persoon">
-              <label>
-                <input type="checkbox" value="${i}"> ${p.naam} (${p.roepnummer})
-              </label>
-            </div>`;
-        }
-      });
-    }
-
-    function maakGroep() {
-      const geselecteerd = Array.from(document.querySelectorAll(".personen-container input:checked"));
-      if (geselecteerd.length === 0 || geselecteerd.length > 3) {
-        alert("Selecteer minimaal 1 en maximaal 3 personen.");
-        return;
-      }
-
-      const groep = geselecteerd.map(cb => personen[cb.value]);
-      groepen.push(groep);
-      geselecteerd.forEach(cb => cb.checked = false);
-      toonGroepen();
-      toonPersonen();
-    }
-
-    function toonGroepen() {
-      const container = document.getElementById("groepenContainer");
-      container.innerHTML = "";
-
-      groepen.forEach((groep, groepIndex) => {
-        const heeftSIV = groep.some(p => p.SIV);
-        const heeftMotor = groep.some(p => p.Motor);
-        const heeftZulu = groep.some(p => p.Zulu);
-
-       let achtergrond = "var(--light)";
-if (heeftSIV || heeftMotor || heeftZulu) {
-  const kleuren = [];
-  if (heeftSIV) kleuren.push("var(--siv)");
-  if (heeftMotor) kleuren.push("var(--motor)");
-  if (heeftZulu) kleuren.push("var(--zulu)");
-  achtergrond = `linear-gradient(to right, ${kleuren.join(", ")})`;
-}
-
-        let ledenHTML = "";
-        groep.forEach((persoon, persoonIndex) => {
-          ledenHTML += `
-            <div class="groep-lid">
-              ${persoon.naam} (${persoon.roepnummer})
-              <button onclick="verwijderPersoonUitGroep(${groepIndex}, ${persoonIndex})">X</button>
-            </div>`;
+      document.querySelectorAll('.filter-buttons button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterAccent = btn.dataset.tag;
+          renderGroepen();
         });
-
-        container.innerHTML += `
-         <div class="groep" style="background: ${achtergrond};">
-
-            <strong>Groep ${groepIndex + 1}</strong>
-            ${ledenHTML}
-            <button onclick="verwijderGroep(${groepIndex})">Verwijder groep</button>
-          </div>`;
       });
-    }
 
-    function verwijderPersoonUitGroep(groepIndex, persoonIndex) {
-      groepen[groepIndex].splice(persoonIndex, 1);
-      if (groepen[groepIndex].length === 0) {
-        groepen.splice(groepIndex, 1);
+      function renderPersonen() {
+        const term = searchInput.value.toLowerCase();
+        personenContainer.innerHTML = '';
+        leden.forEach(lid => {
+          const tekst = `${lid.naam} (${lid.roepnummer})`;
+          const div = document.createElement('div');
+          div.className = 'persoon';
+          div.textContent = tekst;
+          div.dataset.roepnummer = lid.roepnummer;
+          if (term && !tekst.toLowerCase().includes(term)) div.classList.add('hidden');
+          if (geselecteerd.has(lid.roepnummer)) div.classList.add('selected');
+          div.addEventListener('click', () => toggleSelect(lid.roepnummer));
+          personenContainer.appendChild(div);
+        });
+        updateMakeBtn();
       }
-      toonGroepen();
-      toonPersonen();
-    }
 
-    function verwijderGroep(index) {
-      groepen.splice(index, 1);
-      toonGroepen();
-      toonPersonen();
-    }
+      function renderGroepen() {
+        const term = searchInput.value.toLowerCase();
+        groepenContainer.innerHTML = '';
+        groepen.forEach((groep, idx) => {
+          const ledenInGroep = groep.map(rn => allLeden.find(l => l.roepnummer === rn) || { naam: rn, roepnummer: rn });
+          if (term && !ledenInGroep.some(lid => (`${lid.naam} ${lid.roepnummer}`).toLowerCase().includes(term))) return;
 
-    toonPersonen();
+          const specials = ['SIV', 'Motor', 'Zulu', 'OC', 'IBT', 'Recherche', 'HOVJ', 'DSI'];
+          const counter = {};
+          specials.forEach(s => counter[s] = 0);
+          ledenInGroep.forEach(lid => {
+            specials.forEach(s => { if (parseInt(lid[s]) === 1) counter[s]++; });
+          });
+
+          const specialtiesLine = specials.filter(s => counter[s] > 0).map(s => `${counter[s]}x ${s}`).join(', ');
+
+          const blk = document.createElement('div');
+          blk.className = 'groep-block';
+          if (filterAccent && counter[filterAccent] > 0) {
+            blk.classList.add('accent-' + filterAccent.toLowerCase());
+          }
+
+          let html = `<strong>Groep ${idx + 1}</strong>`;
+          ledenInGroep.forEach(lid => {
+            html += `<div>${lid.naam} (${lid.roepnummer})</div>`;
+          });
+          html += `<div class="groep-specials">Koppelspecialiteiten: ${specialtiesLine}</div>`;
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = '✖';
+          deleteBtn.addEventListener('click', () => {
+            const terug = groep.map(rn => allLeden.find(l => l.roepnummer === rn)).filter(Boolean);
+            leden = leden.concat(terug);
+            groepen.splice(idx, 1);
+            renderPersonen();
+            renderGroepen();
+          });
+
+          blk.innerHTML = html;
+          blk.appendChild(deleteBtn);
+          groepenContainer.appendChild(blk);
+        });
+      }
+
+      function toggleSelect(roepnummer) {
+        if (geselecteerd.has(roepnummer)) geselecteerd.delete(roepnummer);
+        else geselecteerd.add(roepnummer);
+        renderPersonen();
+      }
+
+      function updateMakeBtn() {
+        maakGroepBtn.style.display = geselecteerd.size > 0 ? 'inline-block' : 'none';
+      }
+
+      maakGroepBtn.addEventListener('click', () => {
+        const nieuw = Array.from(geselecteerd);
+        groepen.push(nieuw);
+        leden = leden.filter(lid => !geselecteerd.has(lid.roepnummer));
+        geselecteerd.clear();
+        renderPersonen();
+        renderGroepen();
+      });
+
+      searchInput.addEventListener('input', () => {
+        renderPersonen();
+        renderGroepen();
+      });
+
+      fetch('oc_leden.json')
+        .then(res => res.json())
+        .then(data => {
+          allLeden = data;
+          leden = [...data];
+          renderPersonen();
+          renderGroepen();
+        });
+    });
   </script>
-
 </body>
 </html>
