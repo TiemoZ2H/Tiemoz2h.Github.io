@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simpele Missing Poster Maker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    canvas {
+      width: 350px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    button, input[type="file"] {
+      background: #cfa76e;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      padding: 10px 16px;
+      font-weight: bold;
+      margin: 6px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h2>Missing Poster Maker</h2>
+  <input type="file" id="upload" accept="image/*" />
+  <button id="removeBg" disabled>Achtergrond verwijderen</button>
+  <button id="addTemplate" disabled>Template toevoegen</button>
+  <button id="download" disabled>Download poster</button>
+  <canvas id="canvas" width="768" height="1152"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.min.js"></script>
+  <script>
+    const upload = document.getElementById('upload');
+    const removeBg = document.getElementById('removeBg');
+    const addTemplate = document.getElementById('addTemplate');
+    const download = document.getElementById('download');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let model, userImg, cutout, templateImg;
+
+    async function loadModel() {
+      if (!model) {
+        model = await bodyPix.load();
+      }
+    }
+
+    upload.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.onload = () => {
+        userImg = img;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        removeBg.disabled = false;
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    removeBg.addEventListener('click', async () => {
+      await loadModel();
+      const segmentation = await model.segmentPerson(userImg);
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = userImg.width;
+      tempCanvas.height = userImg.height;
+      const tctx = tempCanvas.getContext('2d');
+      tctx.drawImage(userImg, 0, 0);
+      const imgData = tctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      for (let i = 0; i < segmentation.data.length; i++) {
+        if (!segmentation.data[i]) imgData.data[i * 4 + 3] = 0;
+      }
+      tctx.putImageData(imgData, 0, 0);
+      cutout = tempCanvas;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(cutout, 0, 0, canvas.width, canvas.height);
+      addTemplate.disabled = false;
+    });
+
+    addTemplate.addEventListener('click', () => {
+      templateImg = new Image();
+      templateImg.onload = () => {
+        ctx.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(cutout, 140, 340, 480, 360); // positie binnen kader
+        download.disabled = false;
+      };
+      templateImg.src = 'poster-template.png'; // zelfde map
+    });
+
+    download.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'poster.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>
